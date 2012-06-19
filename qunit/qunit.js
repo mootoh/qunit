@@ -6,9 +6,11 @@
  * Copyright (c) 2012 John Resig, Jörn Zaefferer
  * Dual licensed under the MIT (MIT-LICENSE.txt)
  * or GPL (GPL-LICENSE.txt) licenses.
+ * Pulled Live from Git Tue Jun 19 01:20:02 UTC 2012
+ * Last Commit: 1c0af4e943400de73bc36310d3db42a5217da215
  */
 
-(function( window ) {
+//(function( window ) {
 
 var QUnit,
 	config,
@@ -18,7 +20,7 @@ var QUnit,
 	toString = Object.prototype.toString,
 	hasOwn = Object.prototype.hasOwnProperty,
 	defined = {
-	setTimeout: typeof window.setTimeout !== "undefined",
+	setTimeout: setTimeout,
 	sessionStorage: (function() {
 		var x = "qunit-test-string";
 		try {
@@ -364,7 +366,7 @@ QUnit = {
 		}
 		// A slight delay, to avoid any current callbacks
 		if ( defined.setTimeout ) {
-			window.setTimeout(function() {
+			setTimeout(function() {
 				if ( config.semaphore > 0 ) {
 					return;
 				}
@@ -387,7 +389,7 @@ QUnit = {
 
 		if ( config.testTimeout && defined.setTimeout ) {
 			clearTimeout( config.timeout );
-			config.timeout = window.setTimeout(function() {
+			config.timeout = setTimeout(function() {
 				QUnit.ok( false, "Test timed out" );
 				config.semaphore = 1;
 				QUnit.start();
@@ -564,7 +566,7 @@ config = {
 // Initialize more QUnit.config and QUnit.urlParams
 (function() {
 	var i,
-		location = window.location || { search: "", protocol: "file:" },
+		location = (typeof window !== 'undefined' && window.location) || { search: "", protocol: "file:" },
 		params = location.search.slice( 1 ).split( "&" ),
 		length = params.length,
 		urlParams = {},
@@ -665,7 +667,7 @@ extend( QUnit, {
 	reset: function() {
 		var fixture;
 
-		if ( window.jQuery ) {
+		if ( typeof window !== 'undefined' && window.jQuery ) {
 			jQuery( "#qunit-fixture" ).html( config.fixture );
 		} else {
 			fixture = id( "qunit-fixture" );
@@ -946,16 +948,16 @@ QUnit.load = function() {
 	}
 };
 
-addEvent( window, "load", QUnit.load );
+//addEvent( window, "load", QUnit.load );
 
 // `onErrorFnPrev` initialized at top of scope
 // Preserve other handlers
-onErrorFnPrev = window.onerror;
+onErrorFnPrev = this.onerror;
 
 // Cover uncaught exceptions
 // Returning true will surpress the default browser handler,
 // returning false will let it run.
-window.onerror = function ( error, filePath, linerNr ) {
+this.onerror = function ( error, filePath, linerNr ) {
 	var ret = false;
 	if ( onErrorFnPrev ) {
 		ret = onErrorFnPrev( error, filePath, linerNr );
@@ -1163,7 +1165,7 @@ function process( last ) {
 		if ( !defined.setTimeout || config.updateRate <= 0 || ( ( new Date().getTime() - start ) < config.updateRate ) ) {
 			config.queue.shift()();
 		} else {
-			window.setTimeout( next, 13 );
+			setTimeout( next, 13 );
 			break;
 		}
 	}
@@ -1228,7 +1230,7 @@ function extend( a, b ) {
 			delete a[ prop ];
 
 		// Avoid "Member not found" error in IE8 caused by setting window.constructor
-		} else if ( prop !== "constructor" || a !== window ) {
+		} else if ( prop !== "constructor") {
 			a[ prop ] = b[ prop ];
 		}
 	}
@@ -1860,4 +1862,4 @@ if ( typeof exports !== "undefined" ) {
 }
 
 // get at whatever the global object is, like window in browsers
-}( (function() {return this;}.call()) ));
+//}( (function() {return this;}.call()) ));
